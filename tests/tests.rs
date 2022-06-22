@@ -18,7 +18,7 @@ fn test_valid_public_keys() {
 #[test]
 fn test_invalid_public_keys() {
     // Invalid length (Ed25519 should be 32 bytes, not 5).
-    let r = Strkey::from_string("GAAAAAAAACGC6");
+    let r = Strkey::from_string("");
     assert_eq!(r, Err(DecodeError::Invalid));
 
     // Invalid length (congruent to 1 mod 8).
@@ -109,8 +109,8 @@ fn test_invalid_muxed_ed25519() {
     // TODO: This test case is supposed to fail, but it will pass, I think this is the responsibility of the base32 lib
     // maybe related to https://github.com/stellar/rs-stellar-strkey/issues/10
     // The unused trailing bit must be zero in the encoding of the last three bytes (24 bits) as five base-32 symbols (25 bits)
-    // let r = Strkey::from_string("MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAACJUR");
-    // assert_eq!(r, Err(DecodeError::Invalid));
+    let r = Strkey::from_string("MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAACJUR");
+    assert_eq!(r, Err(DecodeError::Invalid));
 
     // Invalid length (congruent to 6 mod 8)
     let r = Strkey::from_string(

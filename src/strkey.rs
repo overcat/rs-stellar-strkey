@@ -244,27 +244,22 @@ fn encode(ver: u8, payload: &[u8]) -> String {
 }
 
 fn decode(s: &str) -> Result<(u8, Vec<u8>), DecodeError> {
-    // TODO: Look at what other base32 implementations are available, because
-    // this one allows for decoding of non-canonical base32 strings, and doesn't
-    // come with helpful methods for validating the length is canonical.
-    let data = base32::decode(base32::Alphabet::RFC4648 { padding: false }, &s);
-    if let Some(data) = data {
-        let s_canonical_len = (data.len() * 8 + 4) / 5;
-        if s.len() != s_canonical_len {
+    let data = match data_encoding::BASE32_NOPAD.decode(s.as_bytes()) {
+        Ok(data) => data,
+        Err(_) => {
             return Err(DecodeError::Invalid);
         }
-        if data.len() < 3 {
-            return Err(DecodeError::Invalid);
-        }
-        let ver = data[0];
-        let (data_without_crc, crc_actual) = data.split_at(data.len() - 2);
-        let crc_expect = checksum(&data_without_crc);
-        if crc_actual != crc_expect {
-            return Err(DecodeError::Invalid);
-        }
-        let payload = &data_without_crc[1..];
-        Ok((ver, payload.to_vec()))
-    } else {
-        Err(DecodeError::Invalid)
+    };
+    // The minimal data length is 3 bytes (version byte and 2-byte CRC)
+    if data.len() < 3 {
+        return Err(DecodeError::Invalid);
     }
+    let ver = data[0];
+    let (data_without_crc, crc_actual) = data.split_at(data.len() - 2);
+    let crc_expect = checksum(&data_without_crc);
+    if crc_actual != crc_expect {
+        return Err(DecodeError::Invalid);
+    }
+    let payload = &data_without_crc[1..];
+    Ok((ver, payload.to_vec()))
 }
