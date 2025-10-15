@@ -11,9 +11,10 @@ edition = "2021"
 rust-version = "1.81.0"
 
 [features]
-default = []
-cli = ["dep:clap", "dep:serde", "dep:cfg_eval", "dep:serde_with", "serde_with/hex", "dep:serde_json", "dep:thiserror"]
-serde = ["dep:serde_with"]
+default = ["alloc"]
+alloc = ["data-encoding/alloc"]
+cli = ["alloc", "dep:clap", "dep:serde", "dep:cfg_eval", "dep:serde_with", "serde_with/hex", "dep:serde_json", "dep:thiserror"]
+serde = ["alloc", "dep:serde_with"]
 
 [[bin]]
 name = "stellar-strkey"
@@ -29,7 +30,7 @@ proptest ="1.0.0"
 serde_test = "1.0.177"
 
 [dependencies]
-data-encoding = { version = "2.6.0", default-features = false, features = ["alloc"] }
+data-encoding = { version = "2.6.0", default-features = false }
 clap = { version = "4.2.4", default-features = false, features = ["std", "derive", "usage", "help"], optional = true }
 serde_with = { version = "3.11.0", optional = true, features = ["hex"] }
 serde = { version = "1", optional = true, features = ["derive"] }
